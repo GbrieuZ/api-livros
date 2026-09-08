@@ -9,8 +9,10 @@ services:
       - .:/app
     env_file:
       - .env
+    environment:
+      - KAFKA_SERVER=kafka:9092
     depends_on:
-      - redis
+      - kafka
     command: ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
   redis:
@@ -30,4 +32,40 @@ services:
     env_file:
       - .env
 
-  
+  zookeeper:
+    #cérebro do kafka, ele comanda toda a operação
+    image: confluentinc/cp-zookeeper:latest
+    container_name: livros-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    #Vai operar o kafka, enviando a msg do backend para o kafka
+    image: confluentinc/cp-kafka:7.5.3
+    container_name: livros-kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: livros-zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kafka-ui:
+    #Gerar um localhost para visualizar
+    image: provectuslabs/kafka-ui:latest
+    container_name: livros-kafka-ui
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+      - zookeeper
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka:9092

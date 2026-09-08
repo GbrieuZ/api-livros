@@ -30,6 +30,7 @@ from tasks import fatorial, somar
 from celery_app import celery_app
 from celery.result import AsyncResult
 from dotenv import load_dotenv
+from kafka_producer import enviar_evento # Publica eventos no Kafka (tópico livros_eventos)
 
 load_dotenv()  # Carrega o arquivo .env quando a API roda fora do container.
 # No Docker/Podman Compose as variáveis já vêm do env_file, e o load_dotenv não atrapalha.
@@ -42,15 +43,23 @@ from sqlalchemy.orm import Session, sessionmaker
 import asyncio
 
 """
-| Biblioteca       | Pra que serve              |
-| ---------------- | -------------------------- |
-| FastAPI          | Criar a API                |
-| FastAPI Security | Autenticação               |
-| Pydantic         | Validação de dados         |
-| typing           | Tipagem (Python padrão)    |
-| secrets          | Segurança (tokens, senhas) |
-| os               | Sistema operacional        |
-| SQLAlchemy       | Banco de dados (ORM)       |
+
+| Biblioteca         | Pra que serve                                     |
+| ------------------ | ------------------------------------------------- |
+| FastAPI            | Criar a API                                       |
+| FastAPI Security   | Autenticação                                      |
+| Pydantic           | Validação de dados                                |
+| typing             | Tipagem (Python padrão)                           |
+| secrets            | Segurança (tokens, senhas)                        |
+| os                 | Sistema operacional                               |
+| SQLAlchemy         | Banco de dados (ORM)                              |
+| redis              | Cache de dados e broker/backend do Celery         |
+| json               | Serializar/desserializar dados salvos no Redis    |
+| python-dotenv      | Carregar variáveis de ambiente do .env            |
+| tasks (local)      | Tarefas assíncronas do Celery (soma e fatorial)   |
+| celery_app (local) | Configuração/instância do Celery                  |
+| celery.result      | Consultar status/resultado de tarefas assíncronas |
+| kafka-python       | Publicar eventos no Kafka                         |
 
 """
 
@@ -257,7 +266,7 @@ async def chamadas_externas():
         "resultado": [resultado1, resultado2, resultado3]
     }
 """
-    
+
 @app.post("/adiciona")
 async def post_livros(livro: Livro, db: Session = Depends(sessao_db), credentials: HTTPBasicCredentials = Depends(autenticar_usuario)):
     # esse db é a conexão com o banco de dados.
@@ -273,6 +282,13 @@ async def post_livros(livro: Livro, db: Session = Depends(sessao_db), credential
     db.refresh(novo_livro) # Aqui eu atualizo o objeto novo_livro com as informações do banco de dados, como o id gerado automaticamente pelo banco de dados.
 
     salvar_livros_redis(novo_livro.id, livro)
+
+    # Publica um evento no Kafka para que outros serviços possam reagir
+    # à criação do livro de forma assíncrona, sem acoplar a API a eles.
+    enviar_evento("livros_eventos",{
+        "acao": "criar",
+        "livro": livro.dict()
+    })
 
     return {"message": f"Livro {novo_livro.nome_livro} adicionado com sucesso!"}
 
