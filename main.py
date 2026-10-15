@@ -60,6 +60,7 @@ import asyncio
 | celery_app (local) | Configuração/instância do Celery                  |
 | celery.result      | Consultar status/resultado de tarefas assíncronas |
 | kafka-python       | Publicar eventos no Kafka                         |
+| Pytest             | Teste de códigos                                  |
 
 """
 
@@ -144,6 +145,10 @@ def autenticar_usuario(credentials: HTTPBasicCredentials = Depends(security)):
             detail="Usuário ou senha incorretos",
             headers={"WWW-Authenticate": "Basic"}
         )
+
+@app.get("/")
+def hello_world():
+    return {"message": "Hello World!"}
 
 @app.post("/calcular/soma")
 def calcular_soma(a: int, b: int):
@@ -238,6 +243,8 @@ def get_livros(
     return resposta
 
 """
+# Chamadas externas
+
 async def chamadas_externas_1():
     await asyncio.sleep(2)
     return "Resutado chamada externa 1"

@@ -14,10 +14,19 @@ dependencies = [
     "aiosqlite (>=0.22.1,<0.23.0)",
     "redis (>=8.0.1,<9.0.0)",
     "celery (>=5.6.3,<6.0.0)",
-    "kafka-python (>=3.0.11,<4.0.0)"
+    "kafka-python (>=3.0.11,<4.0.0)",
+    "pytest (>=9.1.1,<10.0.0)",
+    "pytest-cov (>=7.1.0,<8.0.0)"
 ]
 
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+[dependency-groups]
+dev = [
+    "pytest-mock (>=3.16.0,<4.0.0)"
+]
