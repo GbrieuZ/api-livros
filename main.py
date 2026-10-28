@@ -37,7 +37,7 @@ load_dotenv()  # Carrega o arquivo .env quando a API roda fora do container.
 
 
 from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
 import asyncio
