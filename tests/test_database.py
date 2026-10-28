@@ -46,3 +46,20 @@ def db():
         db.commit()
         app.dependency_overrides.pop(sessao_db, None)
         db.close()
+        
+def test_get_books(db):
+    response = client.get("/livros", auth=("admin", "admin"))
+    assert response.status_code == 200
+
+    data = response.json()
+    assert len(data["livros"]) == 3
+
+    livros_por_nome = {
+        livro["nome_livro"]: livro
+        for livro in data["livros"]
+    }
+
+    assert "Harry Potter 1" in livros_por_nome
+    livro = livros_por_nome["Harry Potter 1"]
+    assert livro["autor_livro"] == "ebac"
+    assert livro["ano_livro"] == 2026
