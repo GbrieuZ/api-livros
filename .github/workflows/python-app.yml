@@ -17,7 +17,7 @@ jobs:
       - name: 🐍 Instalar Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.14'
 
       - name: 🛠 Instalar Poetry
         run: |
@@ -27,11 +27,5 @@ jobs:
       - name: 📦 Instalar dependências com Poetry
         run: poetry install --no-interaction --no-root
 
-      - name: 🧪 Rodar testes (placeholder)
-        run: echo "Nenhum teste configurado ainda."
-
-      - name: 🗄 Verificar conexão com banco de dados
-        env:
-          DATABASE_URL: "sqlite:///./test.db"
-        run: |
-          python -c "from sqlalchemy import create_engine; engine = create_engine('${{ env.DATABASE_URL }}'); conn = engine.connect()"
+      - name: Rodar testes
+        run: poetry run pytest
