@@ -600,3 +600,11 @@ TDD é uma abordagem em que se escreve um teste que falha, implementa-se o códi
 - `tests/test_tasks_endpoit.py`: verifica os endpoints de soma e fatorial com mocks do envio de tarefas e das operações do Redis.
 - `tests/test_auth.py`: verifica autenticação com credenciais válidas e inválidas.
 - `tests/test_database.py`: verifica a listagem de livros, com a dependência do estado do banco descrita acima.
+
+## kubernetes
+Configurações nos arquivos
+service.yaml
+script.sh
+deployment.yaml
+
+Para executar, script.sh no console.
