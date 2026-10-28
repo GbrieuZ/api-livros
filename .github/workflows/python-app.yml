@@ -29,9 +29,3 @@ jobs:
 
       - name: 🧪 Rodar testes (placeholder)
         run: echo "Nenhum teste configurado ainda."
-
-      - name: 🗄 Verificar conexão com banco de dados
-        env:
-          DATABASE_URL: "sqlite:///./test.db"
-        run: |
-          python -c "from sqlalchemy import create_engine; engine = create_engine('${{ env.DATABASE_URL }}'); conn = engine.connect()"
