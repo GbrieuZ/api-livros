@@ -29,6 +29,6 @@ jobs:
 
       - name: Rodar testes
         env:
-          MEU_USUARIO: "usuario_teste"
-          MINHA_SENHA: "senha_teste"
+          MEU_USUARIO: "admin"
+          MINHA_SENHA: "admin"
         run: poetry run pytest
