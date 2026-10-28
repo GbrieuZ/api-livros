@@ -28,4 +28,7 @@ jobs:
         run: poetry install --no-interaction --no-root
 
       - name: Rodar testes
+        env:
+          MEU_USUARIO: "usuario_teste"
+          MINHA_SENHA: "senha_teste"
         run: poetry run pytest
