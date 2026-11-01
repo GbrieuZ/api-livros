@@ -14,5 +14,5 @@ jobs:
       - name: 🔄 Checkout do código
         uses: actions/checkout@v3
 
-      - name: 🐋 Build da imagem Doler
+      - name: 🐋 Build da imagem Docker
         run: docker build -t my-fastapi-app .
